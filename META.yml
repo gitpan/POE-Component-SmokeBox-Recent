@@ -19,7 +19,7 @@ requires:
   Carp: 0
   HTTP::Request: 0
   POE: 0.38
-  POE::Component::Client::FTP: 0.08
+  POE::Component::Client::FTP: 0.1
   POE::Component::Client::HTTP: 0.82
   URI: 0
-version: 0.01
+version: 0.02

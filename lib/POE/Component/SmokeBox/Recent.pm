@@ -8,7 +8,7 @@ use HTTP::Request;
 use File::Spec;
 use vars qw($VERSION);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 sub recent {
   my $package = shift;

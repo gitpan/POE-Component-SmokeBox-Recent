@@ -1,6 +1,10 @@
 Changelog for POE::Component::SmokeBox::Recent
 ==============================================
 
+0.03	Tue Jan  8 16:50:55 GMT 2008
+	- Bumped the required version of PoCo-Client-FTP to known
+	  working version;
+
 0.02	Tue Dec  4 07:08:35 GMT 2007
 	- Bumped the required version of PoCo-Client-FTP to known
 	  working version;

@@ -1,6 +1,7 @@
 package POE::Component::SmokeBox::Recent;
 
 use strict;
+use warnings;
 use Carp;
 use POE qw(Component::Client::HTTP Component::Client::FTP);
 use URI;
@@ -8,7 +9,7 @@ use HTTP::Request;
 use File::Spec;
 use vars qw($VERSION);
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 sub recent {
   my $package = shift;

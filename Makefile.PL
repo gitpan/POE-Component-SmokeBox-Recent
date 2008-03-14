@@ -1,10 +1,15 @@
+use strict;
 use inc::Module::Install;
 name 'POE-Component-SmokeBox-Recent';
 author 'Chris Williams <chris@bingosnet.co.uk>';
 license 'perl';
 version_from 'lib/POE/Component/SmokeBox/Recent.pm';
 abstract_from 'lib/POE/Component/SmokeBox/Recent.pm';
+author_tests 'xt';
 build_requires 'Test::More' => 0.47;
+requires 'strict' => 0;
+requires 'vars' => 0;
+requires 'warnings::compat' => 0 if $] < 5.006;
 requires 'Carp' => 0;
 requires 'URI' => 0;
 requires 'HTTP::Request' => 0;

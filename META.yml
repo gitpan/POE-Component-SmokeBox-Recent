@@ -22,4 +22,7 @@ requires:
   POE::Component::Client::FTP: 0.14
   POE::Component::Client::HTTP: 0.82
   URI: 0
-version: 0.03
+  strict: 0
+  vars: 0
+tests: t/*.t xt/*.t
+version: 0.04

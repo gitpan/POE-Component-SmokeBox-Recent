@@ -1,6 +1,9 @@
 Changelog for POE::Component::SmokeBox::Recent
 ==============================================
 
+1.00	Wed May  7 06:08:22 BST 2008
+	- Added license information, removed kwalitee test
+
 0.04	Fri Mar 14 17:05:49 GMT 2008
 	- Author tests to xt/ Updated prereqs
 

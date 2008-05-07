@@ -6,6 +6,7 @@ license 'perl';
 version_from 'lib/POE/Component/SmokeBox/Recent.pm';
 abstract_from 'lib/POE/Component/SmokeBox/Recent.pm';
 author_tests 'xt';
+perl_version '5.000';
 build_requires 'Test::More' => 0.47;
 requires 'strict' => 0;
 requires 'vars' => 0;
@@ -17,7 +18,13 @@ requires 'POE' => 0.38;
 requires 'POE::Component::Client::HTTP' => 0.82;
 requires 'POE::Component::Client::FTP' => 0.14;
 clean_files 'network.tests';
-my $value = prompt( 'Do you want live network tests [N/y]?', 'N' );
+my $value;
+if ( $Module::Install::AUTHOR ) {
+  $value = 'y';
+}
+else {
+  $value = prompt( 'Do you want live network tests [N/y]?', 'N' );
+}
 if ( $value =~ /^y$/i ) {
   open FH, "> network.tests" or die "$!\n";
   print FH "Bleh\n";

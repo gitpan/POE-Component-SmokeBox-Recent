@@ -3,13 +3,13 @@ package POE::Component::SmokeBox::Recent;
 use strict;
 use warnings;
 use Carp;
-use POE qw(Component::Client::HTTP Component::Client::FTP);
+use POE qw(Component::Client::HTTP Component::SmokeBox::Recent::FTP);
 use URI;
 use HTTP::Request;
 use File::Spec;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01_01';
 
 sub recent {
   my $package = shift;
@@ -25,12 +25,11 @@ sub recent {
   $self->{session_id} = POE::Session->create(
 	object_states => [
 	   $self => [ qw(_start _process_http _process_ftp _recent _http_response) ],
-	   $self => { connect_error => '_connect_error',
-		      login_error   => '_login_error', 
-		      get_error     => '_get_error',
-		      authenticated => '_authenticated',
-		      get_data      => '_get_data',
-		      get_done      => '_get_done', },
+	   $self => { 
+		      ftp_sockerr   => '_get_connect_error',
+		      ftp_error     => '_get_error',
+		      ftp_data      => '_get_data',
+		      ftp_done      => '_get_done', },
 	],
 	heap => $self,
 	( ref($options) eq 'HASH' ? ( options => $options ) : () ),
@@ -117,28 +116,19 @@ sub _http_response {
 
 sub _process_ftp {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
-  POE::Component::Client::FTP->spawn(
-        Alias => 'ftpclient' . $self->{session_id},
+  POE::Component::SmokeBox::Recent::FTP->spawn(
         Username => 'anonymous',
         Password => 'anon@anon.org',
-        RemoteAddr => $self->{uri}->host,
-        Events => [qw(connect_error login_error get_error authenticated get_data get_done)],
-        Filters => { get => POE::Filter::Line->new(), },
+        address  => $self->{uri}->host,
+	port	 => $self->{uri}->port,
+	path     => File::Spec::Unix->catfile( $self->{uri}->path, 'RECENT' ),
   );
   return;
 }
 
-sub _connect_error {
+sub _get_connect_error {
   my ($kernel,$self,@args) = @_[KERNEL,OBJECT,ARG0..$#_];
   $self->{error} = join ' ', @args;
-  $kernel->yield( '_recent', 'ftp' );
-  return;
-}
-
-sub _login_error {
-  my ($kernel,$self,$sender,@args) = @_[KERNEL,OBJECT,SENDER,ARG0..$#_];
-  $self->{error} = join ' ', @args;
-  $kernel->post( $sender, 'quit' );
   $kernel->yield( '_recent', 'ftp' );
   return;
 }
@@ -146,14 +136,7 @@ sub _login_error {
 sub _get_error {
   my ($kernel,$self,$sender,@args) = @_[KERNEL,OBJECT,SENDER,ARG0..$#_];
   $self->{error} = join ' ', @args;
-  $kernel->post( $sender, 'quit' );
   $kernel->yield( '_recent', 'ftp' );
-  return;
-}
-
-sub _authenticated {
-  my ($kernel,$self,$sender) = @_[KERNEL,OBJECT,SENDER];
-  $kernel->post( $sender, 'get', File::Spec::Unix->catfile( $self->{uri}->path, 'RECENT' ) );
   return;
 }
 
@@ -168,7 +151,6 @@ sub _get_data {
 
 sub _get_done {
   my ($kernel,$self,$sender) = @_[KERNEL,OBJECT,SENDER];
-  $kernel->post( $sender, 'quit' );
   $kernel->yield( '_recent', 'ftp' );
   return;
 }

@@ -4,26 +4,26 @@ author:
   - 'Chris Williams <chris@bingosnet.co.uk>'
 build_requires:
   Test::More: 0.47
+  Test::POE::Server::TCP: 0.14
 distribution_type: module
-generated_by: 'Module::Install version 0.72'
+generated_by: 'Module::Install version 0.77'
 license: perl
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.3.html
-  version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
 name: POE-Component-SmokeBox-Recent
 no_index:
   directory:
     - inc
     - t
+    - examples
 requires:
-  Carp: 0
   HTTP::Request: 0
   POE: 0.38
-  POE::Component::Client::FTP: 0.14
   POE::Component::Client::HTTP: 0.82
+  Test::POE::Client::TCP: 0.08
   URI: 0
-  perl: 5.000
-  strict: 0
-  vars: 0
-tests: 't/*.t xt/*.t'
-version: 1.00
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.01_01

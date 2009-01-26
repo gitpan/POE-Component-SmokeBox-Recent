@@ -1,6 +1,10 @@
 Changelog for POE::Component::SmokeBox::Recent
 ==============================================
 
+1.04	Mon Jan 26 21:09:25 GMT 2009
+	- Use PoCo-Client-DNS for name resolution in
+	  FTP.pm
+
 1.02	Sun Jan 18 08:49:27 GMT 2009
 	- Bump to stable release.
 

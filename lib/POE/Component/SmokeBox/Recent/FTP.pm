@@ -2,12 +2,13 @@ package POE::Component::SmokeBox::Recent::FTP;
 
 use strict;
 use warnings;
-use POE qw(Filter::Line);
+use POE qw(Filter::Line Component::Client::DNS);
+use Net::IP qw(ip_get_version);
 use Test::POE::Client::TCP;
 use Carp qw(carp croak);
 use vars qw($VERSION);
 
-$VERSION = '0.02';
+$VERSION = '0.04';
 
 sub spawn {
   my $package = shift;
@@ -27,6 +28,9 @@ sub spawn {
 	$self => [qw(
 		_start
 		_retr_done
+		_resolve
+		_response
+		_connect
 	)],
      ],
      heap => $self,
@@ -62,8 +66,50 @@ sub _start {
   $kernel->refcount_increment( $sender_id, __PACKAGE__ );
   $self->{sender_id} = $sender_id;
 
+  $self->{_resolver} = POE::Component::Client::DNS->spawn(
+	Alias => 'Resolver-' . $self->{session_id},
+  );
+
+  $kernel->yield( '_resolve' );
+  return;
+}
+
+sub _resolve {
+  my ($kernel,$self) = @_[KERNEL,OBJECT];
+  if ( ip_get_version( $self->{address} ) ) {
+     # It is an address already
+     $kernel->yield( '_connect', $self->{address} );
+     return;
+  }
+  my $resp = $self->{_resolver}->resolve(
+     host 	=> $self->{address},
+     context 	=> { },
+     event	=> '_response',
+  );
+  $kernel->yield( '_response', $resp ) if $resp;
+  return;
+}
+
+sub _response {
+  my ($kernel,$self,$resp) = @_[KERNEL,OBJECT,ARG0];
+  if ( $resp->{error} and $resp->{error} ne 'NOERROR' ) {
+     $kernel->yield( 'cmdc_socket_failed', $resp->{error} );
+     return;
+  }
+  my @answers = $resp->{response}->answer;
+  foreach my $answer ( $resp->{response}->answer() ) {
+     next if $answer->type !~ /^A/;
+     $kernel->yield( '_connect', $answer->rdatastr );
+     return;
+  }
+  $kernel->yield( 'cmdc_socket_failed', 'Could not resolve address' );
+  return;
+}
+
+sub _connect {
+  my ($self,$address) = @_[OBJECT,ARG0];
   $self->{cmdc} = Test::POE::Client::TCP->spawn(
-	address     => $self->{address},
+	address     => $address,
 	port        => $self->{port} || 21,
 	prefix      => 'cmdc',
 	autoconnect => 1,
@@ -76,8 +122,10 @@ sub _cmdc_socket_failed {
   my ($kernel,$self,@errors) = @_[KERNEL,OBJECT,ARG0..$#_];
   $self->_send_event( $self->{prefix} . 'sockerr', @errors );
   $kernel->refcount_decrement( $self->{sender_id}, __PACKAGE__ );
-  $self->{cmdc}->shutdown();
+  $self->{cmdc}->shutdown() if $self->{cmdc};
+  $self->{_resolver}->shutdown();
   delete $self->{cmdc};
+  delete $self->{_resolver};
   return;
 }
 

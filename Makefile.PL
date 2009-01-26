@@ -12,6 +12,7 @@ build_requires 'Test::POE::Server::TCP' => 0.14;
 requires 'URI' => 0;
 requires 'HTTP::Request' => 0;
 requires 'POE' => 0.38;
+requires 'POE::Component::Client::DNS' => 1.02;
 requires 'POE::Component::Client::HTTP' => 0.82;
 requires 'Test::POE::Client::TCP' => 0.08;
 clean_files 'network.tests';

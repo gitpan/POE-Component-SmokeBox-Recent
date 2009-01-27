@@ -1,15 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
-use POE qw(Component::SmokeBox::Recent Filter::Stream);
+use Test::More tests => 6;
+use POE qw(Component::SmokeBox::Recent Filter::HTTP::Parser);
 use Test::POE::Server::TCP;
+use HTTP::Date qw( time2str );
+use HTTP::Response;
 
-my $recent = <<RECENTFILE;
-200 OK HTTP/1.1
-Connection: close
-Content-Length: 969
-Content-Type: text/plain
-
+my @data = qw(
 MIRRORING.FROM
 RECENT
 RECENT.html
@@ -39,7 +36,7 @@ authors/id/A/AD/ADAMK/Test-NeedsDisplay-1.07.tar.gz
 authors/id/A/AD/ADAMK/YAML-Tiny-1.36.meta
 authors/id/A/AD/ADAMK/YAML-Tiny-1.36.readme
 authors/id/A/AD/ADAMK/YAML-Tiny-1.36.tar.gz
-RECENTFILE
+);
 
 my @tests = qw(
 A/AA/AAU/MRIM/Net-MRIM-1.10.tar.gz
@@ -61,7 +58,7 @@ exit 0;
 sub _start {
   my $heap = $_[HEAP];
   $heap->{testd} = Test::POE::Server::TCP->spawn(
-    filter => POE::Filter::Stream->new,
+    filter => POE::Filter::HTTP::Parser->new( type => 'server' ),
     address => '127.0.0.1',
   );
   my $port = $heap->{testd}->port;
@@ -85,10 +82,20 @@ sub testd_registered {
 }
 
 sub testd_client_input {
-  my ($kernel, $heap, $id, $input) = @_[KERNEL, HEAP, ARG0, ARG1];
-  diag($input);
-  pass('Got a recent file request');
-  $heap->{testd}->send_to_client($id, $recent);
+  my ($kernel, $heap, $id, $req) = @_[KERNEL, HEAP, ARG0, ARG1];
+  diag($req->as_string);
+  isa_ok($req, 'HTTP::Request');
+  is( $req->uri->path, '/RECENT', 'Requested /RECENT' );
+  my $resp = HTTP::Response->new( 200 );
+  $resp->protocol('HTTP/1.1');
+  $resp->header('Content-Type', 'text/plain');
+  $resp->header('Date', time2str(time));
+  $resp->header('Server', 'Test-POE-Server-TCP/' . $Test::POE::Server::TCP::VERSION);
+  $resp->header('Connection', 'close');
+  $resp->content( join "\n", @data );
+  use bytes;
+  $resp->header('Content-Length', length $resp->content);
+  $heap->{testd}->send_to_client($id, $resp);
   return;
 }
 

@@ -39,5 +39,6 @@ sub recent {
   my $hashref = $_[ARG0];
   ok( $hashref->{recent}, 'We got a RECENT listing' );
   ok( $hashref->{context} eq 'Blah Blah Blah', 'Context was okay' );
+  diag($_) for @{ $hashref->{recent} };
   return;
 }

@@ -1,6 +1,13 @@
 Changelog for POE::Component::SmokeBox::Recent
 ==============================================
 
+1.06	Tue Jan 27 16:38:48 GMT 2009
+	- Added miniHTTP client
+	- Refactored to use HTTP.pm
+	- Refactored tests and added tests
+	- Removed dependency on PoCo-Client-HTTP
+	- Added new dependencies
+
 1.04	Mon Jan 26 21:09:25 GMT 2009
 	- Use PoCo-Client-DNS for name resolution in
 	  FTP.pm

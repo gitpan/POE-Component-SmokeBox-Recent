@@ -3,13 +3,13 @@ package POE::Component::SmokeBox::Recent;
 use strict;
 use warnings;
 use Carp;
-use POE qw(Component::Client::HTTP Component::SmokeBox::Recent::FTP);
+use POE qw(Component::SmokeBox::Recent::HTTP Component::SmokeBox::Recent::FTP);
 use URI;
 use HTTP::Request;
 use File::Spec;
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.06';
 
 sub recent {
   my $package = shift;
@@ -24,8 +24,10 @@ sub recent {
 	unless $self->{uri}->scheme and $self->{uri}->scheme =~ /^(ht|f)tp$/;
   $self->{session_id} = POE::Session->create(
 	object_states => [
-	   $self => [ qw(_start _process_http _process_ftp _recent _http_response) ],
+	   $self => [ qw(_start _process_http _process_ftp _recent) ],
 	   $self => { 
+		      http_sockerr   => '_get_connect_error',
+		      http_response => '_http_response',
 		      ftp_sockerr   => '_get_connect_error',
 		      ftp_error     => '_get_error',
 		      ftp_data      => '_get_data',
@@ -55,10 +57,6 @@ sub _start {
   else {
     $sender_id = $sender->ID();
   }
-  if ( $self->{http_alias} ) {
-     my $http_ref = $kernel->alias_resolve( $self->{http_alias} );
-     $self->{http_id} = $http_ref->ID() if $http_ref;
-  }
   $kernel->refcount_increment( $sender_id, __PACKAGE__ );
   $self->{sender_id} = $sender_id;
   $kernel->yield( '_process_' . $self->{uri}->scheme );
@@ -76,29 +74,20 @@ sub _recent {
   my $event = delete $self->{event};
   $kernel->post( $target, $event, \%reply );
   $kernel->refcount_decrement( $target, __PACKAGE__ );
-  $kernel->post( $self->{http_id}, 'shutdown' ) if $type eq 'http' and !$self->{http_alias}; 
   return;
 }
 
 sub _process_http {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
-  unless ( $self->{http_id} ) {
-    $self->{http_id} = 'smokeboxhttp' . $$ . $self->{session_id};
-    POE::Component::Client::HTTP->spawn(
-	Alias     => $self->{http_id},
-	FollowRedirects => 2,
-    );
-  }
   $self->{uri}->path( File::Spec::Unix->catfile( $self->{uri}->path(), 'RECENT' ) );
-  $kernel->post( $self->{http_id}, 'request', '_http_response', 
-	HTTP::Request->new(GET => $self->{uri}->as_string()),
-	$self->{session_id} );
+  POE::Component::SmokeBox::Recent::HTTP->spawn(
+	uri => $self->{uri},
+  );
   return;
 }
 
 sub _http_response {
-  my ($kernel,$self,$request_packet,$response_packet) = @_[KERNEL,OBJECT,ARG0,ARG1];
-  my $response = $response_packet->[0];
+  my ($kernel,$self,$response) = @_[KERNEL,OBJECT,ARG0];
   if ( $response->code() == 200 ) {
     for ( split /\n/, $response->content() ) {
        next unless /^authors/;

@@ -9,7 +9,7 @@ use HTTP::Request;
 use File::Spec;
 use vars qw($VERSION);
 
-$VERSION = '1.06';
+$VERSION = '1.08';
 
 sub recent {
   my $package = shift;
@@ -26,7 +26,8 @@ sub recent {
 	object_states => [
 	   $self => [ qw(_start _process_http _process_ftp _recent) ],
 	   $self => { 
-		      http_sockerr   => '_get_connect_error',
+		      http_sockerr  => '_get_connect_error',
+		      http_timeout  => '_get_connect_error',
 		      http_response => '_http_response',
 		      ftp_sockerr   => '_get_connect_error',
 		      ftp_error     => '_get_error',

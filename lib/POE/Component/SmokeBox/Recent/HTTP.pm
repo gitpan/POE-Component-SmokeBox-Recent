@@ -33,6 +33,7 @@ sub spawn {
 		_response
 		_connect
 		_shutdown
+		_timeout
 	)],
      ],
      heap => $self,
@@ -124,6 +125,15 @@ sub _web_connected {
   $req->header( 'Host', $self->{address} . ( $self->{port} ne '80' ? ":$self->{port}" : '' ) );
   $req->user_agent( sprintf( 'POE-Component-SmokeBox-Recent-HTTP/%s (perl; N; POE; en; rv:%f)', $VERSION, $VERSION ) );
   $self->{web}->send_to_server( $req );
+  $poe_kernel->delay( '_timeout', $self->{timeout} || 60 );
+  return;
+}
+
+sub _timeout {
+  my ($kernel,$self) = @_[KERNEL,OBJECT];
+  $self->_send_event( $self->{prefix} . 'timeout', "Timed out connection after " . ( $self->{timeout} || 60 ) . " seconds." );
+  $kernel->refcount_decrement( $self->{sender_id}, __PACKAGE__ );
+  $kernel->yield( '_shutdown' );
   return;
 }
 
@@ -132,10 +142,12 @@ sub _web_socket_failed {
   $self->_send_event( $self->{prefix} . 'sockerr', @errors );
   $kernel->refcount_decrement( $self->{sender_id}, __PACKAGE__ );
   $kernel->yield( '_shutdown' );
+  return;
 }
 
 sub _web_input {
   my ($kernel,$self,$resp) = @_[KERNEL,OBJECT,ARG0];
+  $kernel->delay( '_timeout' );
   $self->_send_event( $self->{prefix} . 'response', $resp );
   $kernel->refcount_decrement( $self->{sender_id}, __PACKAGE__ );
   $self->{web}->shutdown();
@@ -157,6 +169,7 @@ sub _send_event {
 
 sub _shutdown {
   my $self = $_[OBJECT];
+  $poe_kernel->delay( '_timeout' );
   $self->{web}->shutdown() if $self->{web};
   $self->{_resolver}->shutdown() if $self->{_resolver};
   delete $self->{web};
@@ -169,62 +182,63 @@ __END__
 
 =head1 NAME
 
-POE::Component::SmokeBox::Recent::FTP - an extremely minimal FTP client
+POE::Component::SmokeBox::Recent::HTTP - an extremely minimal HTTP client
 
 =head1 SYNOPSIS
 
   # Obtain the RECENT file from a given CPAN mirror.
-  use strict;
-  use warnings;
-  use File::Spec;
-  use POE qw(Component::SmokeBox::Recent::FTP);
-  
-  my $site = shift || die "You must provide a site parameter\n";
-  my $path = shift || '/';
-  
-  POE::Session->create(
-     package_states => [
-  	main => [qw(_start ftp_sockerr ftp_error ftp_data ftp_done)],
-     ]
-  );
-  
-  $poe_kernel->run();
-  exit 0;
-  
-  sub _start {
-    POE::Component::SmokeBox::Recent::FTP->spawn(
-  	address => $site,
-  	path    => File::Spec::Unix->catfile( $path, 'RECENT' )
-    );
-    return;
-  }
-  
-  sub ftp_sockerr {
-    warn join ' ', @_[ARG0..$#_];
-    return;
-  }
-  
-  sub ftp_error {
-    warn "Error: '" . $_[ARG0] . "'\n";
-    return;
-  }
-  
-  sub ftp_data {
-    print $_[ARG0], "\n";
-    return;
-  }
-  
-  sub ftp_done {
-    warn "Transfer complete\n";
-    return;
-  }
+   use strict;
+   use warnings;
+   use File::Spec;
+   use POE qw(Component::SmokeBox::Recent::HTTP);
+   use URI;
+   
+   my $url = shift || die "You must provide a url parameter\n";
+   
+   my $uri = URI->new( $url );
+   
+   die "Unsupported scheme\n" unless $uri->scheme and $uri->scheme eq 'http';
+   
+   $uri->path( File::Spec::Unix->catfile( $uri->path(), 'RECENT' ) );
+   
+   POE::Session->create(
+      package_states => [
+   	main => [qw(_start http_sockerr http_timeout http_response)],
+      ]
+   );
+   
+   $poe_kernel->run();
+   exit 0;
+   
+   sub _start {
+     POE::Component::SmokeBox::Recent::HTTP->spawn(
+   	uri => $uri,
+     );
+     return;
+   }
+   
+   sub http_sockerr {
+     warn join ' ', @_[ARG0..$#_];
+     return;
+   }
+   
+   sub http_timeout {
+     warn $_[ARG0], "\n";
+     return;
+   }
+   
+   sub http_response {
+     my $http_response = $_[ARG0];
+     print $http_response->as_string;
+     return;
+   }
 
 =head1 DESCRIPTION
 
-POE::Component::SmokeBox::Recent::FTP is the small helper module used by L<POE::Component::SmokeBox::Recent> to
-do FTP client duties.
+POE::Component::SmokeBox::Recent::HTTP is the small helper module used by L<POE::Component::SmokeBox::Recent> to
+do HTTP client duties.
 
-It only implements an ascii type passive FTP C<RETR>.
+It only implements a simple request with no following of redirections and connection keep-alive, etc.
 
 =head1 CONSTRUCTOR
 
@@ -234,35 +248,32 @@ It only implements an ascii type passive FTP C<RETR>.
 
 Takes a number of parameters:
 
-  'address', the hostname/address of the FTP site to connect to, mandatory;
-  'path', the path to the file you want to retrieve from the site, mandatory;
+  'uri', a URI object for the URL you wish to retrieve, mandatory;
   'session', optional if the poco is spawned from within another session;
-  'prefix', specify an event prefix other than the default of 'ftp';
+  'prefix', specify an event prefix other than the default of 'http';
+  'timeout', specify a timeout in seconds, default is 60;
 
 =back
 
 =head1 OUTPUT EVENTS
 
-The component sends the following events. If you have changed the C<prefixi> option in C<spawn> then substitute C<ftp> 
+The component sends the following events. If you have changed the C<prefix> option in C<spawn> then substitute C<http> 
 with the event prefix that you specified.
 
 =over 
 
-=item C<ftp_sockerr>
+=item C<http_sockerr>
 
-Generated if there is a problem connecting to the given FTP host/address. C<ARG0> contains the name of the operation that failed. C<ARG1> and C<ARG2> hold numeric and string values for C<$!>, respectively.
+Generated if there is a problem connecting to the given HTTP host/address. C<ARG0> contains the name of the operation that failed. C<ARG1> and C<ARG2> hold numeric and string values for C<$!>, respectively.
 
-=item C<ftp_error>
+=item C<http_timeout>
 
-Generated if there is an FTP error. C<ARG0> contains the error sent by the server.
+Triggered if we don't get a response from the HTTP server. 
 
-=item C<ftp_data>
+=item C<http_response>
 
-One of these events will be emitted for each line of file you have specified to be retrieved. C<ARG0> contains that line.
-
-=item C<ftp_done>
-
-Emitted when the transfer has finished.
+Emitted when the transfer has finished. C<ARG0> will be a L<HTTP::Response> object. It is up to you to check the status, etc. of the
+response.
 
 =back 
 

@@ -1,4 +1,5 @@
 Changes
+examples/http.pl
 examples/retr.pl
 examples/synopsis.pl
 inc/Module/Install.pm
@@ -21,6 +22,7 @@ README
 t/00_use.t
 t/01_http.t
 t/01_http_sockerr.t
+t/01_http_timeout.t
 t/01_retr.t
 t/01_retr_error.t
 t/01_retr_sockerr.t

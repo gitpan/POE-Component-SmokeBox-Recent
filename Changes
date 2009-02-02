@@ -1,6 +1,14 @@
 Changelog for POE::Component::SmokeBox::Recent
 ==============================================
 
+1.10	Mon Feb  2 14:56:10 GMT 2009
+	- Fixed 01_http_sockerr.t to skip on broken DNS
+	  configurations.
+
+1.08	Jan 29 2009
+	- Added timeout to HTTP.pm, additional tests.
+	- Fixed POD in HTTP.pm
+
 1.06	Tue Jan 27 16:38:48 GMT 2009
 	- Added miniHTTP client
 	- Refactored to use HTTP.pm

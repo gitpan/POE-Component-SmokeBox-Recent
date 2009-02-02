@@ -11,7 +11,7 @@ $uri->port('/pub/CPAN/RECENT');
 
 POE::Session->create(
   package_states => [
-	main => [qw(_start _stop http_sockerr)],
+	main => [qw(_start _stop http_sockerr http_response _default)],
   ]
 );
 
@@ -26,6 +26,14 @@ sub _start {
 
 sub http_sockerr {
   pass($_[STATE]);
+  return;
+}
+
+sub http_response {
+  SKIP: {
+     skip 'Oh no, we got a HTTP::Response and we shouldn\'t. Broken DNS, because "bogus.gumbybrain.com" just should not resolve', 1;
+  }
+  diag($_[ARG0]->as_string());
   return;
 }
 

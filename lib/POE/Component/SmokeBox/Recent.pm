@@ -9,7 +9,7 @@ use HTTP::Request;
 use File::Spec;
 use vars qw($VERSION);
 
-$VERSION = '1.10';
+$VERSION = '1.12';
 
 sub recent {
   my $package = shift;
@@ -59,6 +59,7 @@ sub _start {
     $sender_id = $sender->ID();
   }
   $kernel->refcount_increment( $sender_id, __PACKAGE__ );
+  $kernel->detach_myself();
   $self->{sender_id} = $sender_id;
   $kernel->yield( '_process_' . $self->{uri}->scheme );
   return;

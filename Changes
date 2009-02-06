@@ -1,6 +1,9 @@
 Changelog for POE::Component::SmokeBox::Recent
 ==============================================
 
+1.12	Fri Feb  6 11:38:17 GMT 2009
+	- Added detach_myself() which fixes a refcount leak.
+
 1.10	Mon Feb  2 14:56:10 GMT 2009
 	- Fixed 01_http_sockerr.t to skip on broken DNS
 	  configurations.

@@ -32,4 +32,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/bingos/poe-component-smokebox-recent.git
-version: 1.14
+version: 1.16

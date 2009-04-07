@@ -7,8 +7,10 @@ build_requires:
   HTTP::Response: 0
   Test::More: 0.47
   Test::POE::Server::TCP: 0.14
+configure_requires:
+  ExtUtils::MakeMaker: 6.50
 distribution_type: module
-generated_by: 'Module::Install version 0.79'
+generated_by: 'Module::Install version 0.81'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,4 +31,5 @@ requires:
   perl: 5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.12
+  repository: git://github.com/bingos/poe-component-smokebox-recent.git
+version: 1.14

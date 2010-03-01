@@ -3,14 +3,15 @@ abstract: 'A POE component to retrieve recent CPAN uploads.'
 author:
   - 'Chris Williams <chris@bingosnet.co.uk>'
 build_requires:
+  ExtUtils::MakeMaker: 6.42
   HTTP::Date: 0
   HTTP::Response: 0
   Test::More: 0.47
   Test::POE::Server::TCP: 0.14
 configure_requires:
-  ExtUtils::MakeMaker: 6.50
+  ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 0.81'
+generated_by: 'Module::Install version 0.94'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +22,17 @@ no_index:
     - examples
     - inc
     - t
+    - xt
+provides:
+  POE::Component::SmokeBox::Recent:
+    file: lib/POE/Component/SmokeBox/Recent.pm
+    version: 1.18
+  POE::Component::SmokeBox::Recent::FTP:
+    file: lib/POE/Component/SmokeBox/Recent/FTP.pm
+    version: 1.18
+  POE::Component::SmokeBox::Recent::HTTP:
+    file: lib/POE/Component/SmokeBox/Recent/HTTP.pm
+    version: 1.18
 requires:
   HTTP::Request: 0
   POE: 0.38
@@ -30,6 +42,7 @@ requires:
   URI: 0
   perl: 5.6.0
 resources:
+  homepage: http://github.com/bingos/poe-component-smokebox-recent/tree
   license: http://dev.perl.org/licenses/
   repository: git://github.com/bingos/poe-component-smokebox-recent.git
-version: 1.16
+version: 1.18

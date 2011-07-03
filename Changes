@@ -1,80 +1,118 @@
-Changelog for POE::Component::SmokeBox::Recent
-==============================================
+==============================
+2011-07-03 23:41:28 +0100 0.32
+==============================
 
-1.30  Tue Mar  8 01:00:56 GMT 2011
-1.28  Fri Nov 26 11:32:15 GMT 2010
-  - Update required version of POE::Filter::HTTP::Parser
+  commit 3198f4e41bf11ba8935ce55169fdbb583ac14533
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Jul 3 23:38:14 2011 +0100
+  
+    Update required prereqs 
 
-  - Fallback on normal RECENT retrieval behaviour when epoch fails
+==============================
+2011-03-08 01:02:18 +0000 1.30
+==============================
+
+  commit dc4288364ae3b5336d1e5c4b0be538e33ff33ece
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Mar 8 01:02:18 2011 +0000
+  
+    Update required version of POE::Filter::HTTP::Parser 
+
+==============================
+2010-11-26 11:32:55 +0000 1.28
+==============================
+
+  commit 3237504fc17d94da1cd68bbd72af5e24cb2d21cc
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Fri Nov 26 11:32:55 2010 +0000
+  
+    Bump version, update Changes
+
+  commit 7d02e937c9adf006baf708d1d2ba1e7fe13ede0b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Fri Nov 26 11:09:09 2010 +0000
+  
+    Fallback on normal RECENT retrieval behaviour when epoch fails
+
     Like in the case that someone is using a CPAN::Mini mirror
-    rather than a 'real' CPAN Mirror. Reported by Nigel Horne
 
-1.26  Mon Nov 15 23:08:14 GMT 2010
-  - Added 'epoch' option for determining dists from a given
-    epoch timestamp
+    rather than a 'real' CPAN Mirror.
 
-1.24  Thu Sep  2 14:42:40 BST 2010
-  - Added support for RSS retrieval
+    Reported by Nigel Horne 
 
-1.22  Mon Jun 21 21:08:22 BST 2010
-  - Forgot to append 'RECENT' to file urls.
+==============================
+2010-11-15 23:10:21 +0000 1.26
+==============================
 
-1.20  Mon Jun 21 10:39:54 BST 2010
-  - Added support for file urls, RT #58421 by Nigel Horne
+  commit 7f494b5f0f64e0088944fcdff79e6e568ff332c4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Nov 15 23:10:21 2010 +0000
+  
+    Release updates
 
-1.18  Mon Mar  1 10:48:37 GMT 2010
-  - Tidied up distribution and Makefile.PL
+  commit 32b290aa77f660ff6c1b7600dcad7c782531c47d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Nov 15 23:03:48 2010 +0000
+  
+    Added 'epoch' option for determining dists from a given epoch
+    timestamp 
 
-1.16	Tue Apr  7 20:51:46 BST 2009
-	- Make auto_set_repository() only run at author-time
+==============================
+2010-09-02 15:02:12 +0100 1.24
+==============================
 
-1.14	Tue Apr  7 12:21:00 BST 2009
-	- Refactored the FTP.pm to remove SIZE query because of weirdness
-	  with cpan.cpantesters.org FTP server.
+  commit 5eeea57b880d611c2ef3be0f64e9ca5b8dc72d11
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Sep 2 15:02:12 2010 +0100
+  
+    Added support for RSS retrieval 
 
-1.12	Fri Feb  6 11:38:17 GMT 2009
-	- Added detach_myself() which fixes a refcount leak.
+==============================
+2010-06-21 21:09:45 +0100 1.22
+==============================
 
-1.10	Mon Feb  2 14:56:10 GMT 2009
-	- Fixed 01_http_sockerr.t to skip on broken DNS
-	  configurations.
+  commit 796c8179d4d4b98e96c3b4b9c5f75beeb3a320b3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Jun 21 21:09:45 2010 +0100
+  
+    Forgot to append 'RECENT' to file urls. 
 
-1.08	Jan 29 2009
-	- Added timeout to HTTP.pm, additional tests.
-	- Fixed POD in HTTP.pm
+==============================
+2010-06-21 10:41:05 +0100 1.20
+==============================
 
-1.06	Tue Jan 27 16:38:48 GMT 2009
-	- Added miniHTTP client
-	- Refactored to use HTTP.pm
-	- Refactored tests and added tests
-	- Removed dependency on PoCo-Client-HTTP
-	- Added new dependencies
+  commit 9fc6614b5f86158315b3182e3a4825e39d6c44cd
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Jun 21 10:41:05 2010 +0100
+  
+    Added support for file urls, requested by Nigel Horne RT #58421
 
-1.04	Mon Jan 26 21:09:25 GMT 2009
-	- Use PoCo-Client-DNS for name resolution in
-	  FTP.pm
+  commit 7a0bd3a92f693ef3b7482e4f7f2fc1dfadba5576
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Jun 21 09:38:53 2010 +0100
+  
+    Sync 
 
-1.02	Sun Jan 18 08:49:27 GMT 2009
-	- Bump to stable release.
+==============================
+2010-03-01 11:18:03 +0000 1.18
+==============================
 
-1.01_01	Sat Jan 17 21:15:35 GMT 2009
-	- Added our own bundled miniFTP client
-	- Pod tidying. 
-	- Removed dependency of PoCo-Client-FTP
+  commit 30bb953530f7892d21e106c270fafeef2f00e7a2
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Mon Mar 1 11:18:03 2010 +0000
+  
+    Tidy up distribution and Makefile.PL, adjust some of the live tests 
 
-1.00	Wed May  7 06:08:22 BST 2008
-	- Added license information, removed kwalitee test
+==============================
+2009-04-07 20:52:37 +0100 1.16
+==============================
 
-0.04	Fri Mar 14 17:05:49 GMT 2008
-	- Author tests to xt/ Updated prereqs
+  commit 7af137633a88b1f4d258d47eff4c793c83d1e302
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Tue Apr 7 20:52:37 2009 +0100
+  
+    Make auto_set_repository() only run at author-time 
 
-0.03	Tue Jan  8 16:50:55 GMT 2008
-	- Bumped the required version of PoCo-Client-FTP to known
-	  working version;
-
-0.02	Tue Dec  4 07:08:35 GMT 2007
-	- Bumped the required version of PoCo-Client-FTP to known
-	  working version;
-
-0.01	Sat Nov 24 11:44:31 GMT 2007
-	- Initial CPAN Release
+==============
+End of Excerpt
+==============

@@ -1,4 +1,14 @@
 ==============================
+2012-07-20 10:16:41 +0100 1.38
+==============================
+
+  commit ce5acfd7fceab9f01e5e07c839a808f0384460f4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Fri Jul 20 10:16:41 2012 +0100
+  
+    Set cpantesters.org test to TODO for the moment due to failing test 
+
+==============================
 2011-11-17 22:06:59 +0000 1.36
 ==============================
 

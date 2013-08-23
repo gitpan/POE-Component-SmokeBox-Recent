@@ -27,13 +27,13 @@ no_index:
 provides:
   POE::Component::SmokeBox::Recent:
     file: lib/POE/Component/SmokeBox/Recent.pm
-    version: 1.42
+    version: 1.44
   POE::Component::SmokeBox::Recent::FTP:
     file: lib/POE/Component/SmokeBox/Recent/FTP.pm
-    version: 1.42
+    version: 1.44
   POE::Component::SmokeBox::Recent::HTTP:
     file: lib/POE/Component/SmokeBox/Recent/HTTP.pm
-    version: 1.42
+    version: 1.44
 requires:
   CPAN::Recent::Uploads: 0.06
   HTTP::Request: 0
@@ -47,8 +47,5 @@ requires:
 resources:
   homepage: https://github.com/bingos/poe-component-smokebox-recent/tree
   license: http://dev.perl.org/licenses/
-  repository:
-    type: git
-    url: git://github.com/bingos/poe-component-smokebox-recent.git
-    web: https://github.com/bingos/poe-component-smokebox-recent/tree
-version: 1.42
+  repository: git://github.com/bingos/poe-component-smokebox-recent.git
+version: 1.44
